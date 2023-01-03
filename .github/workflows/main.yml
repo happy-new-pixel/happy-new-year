@@ -1,0 +1,39 @@
+# This workflow will append Lorem Ipsum to a file every day, six times a day, between 13 and 14, and commit the changes
+name: GitHub Actions Demo Test Execution
+
+on:
+    workflow_dispatch:
+    schedule:
+        # Runs “At every 6th minute past hour 13.” (see https://crontab.guru)
+        - cron: '*/6 13 * * *'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
+
+            - name: Run script
+              run: node run.js
+
+            - name: Check file existence
+              id: check_files
+              uses: andstor/file-existence-action@v2
+              with:
+                  files: 'commitMsg'
+
+            - name: Commit files
+              if: steps.check_files.outputs.files_exists == 'true'
+              run: |
+                  echo "" >> lorem
+                  npx --yes lorem-ipsum 1 paragraph >> lorem
+                  git config --local user.email ${{ secrets.MY_GITHUB_EMAIL }}
+                  git add lorem
+                  git commit -m "$(<commitMsg)"
+                  rm commitMsg
+
+            - name: Push changes
+              if: steps.check_files.outputs.files_exists == 'true'
+              uses: ad-m/github-push-action@master
