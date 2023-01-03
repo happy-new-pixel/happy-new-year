@@ -1,5 +1,5 @@
 # This workflow will append Lorem Ipsum to a file every day, six times a day, between 13 and 14, and commit the changes
-name: GitHub Actions Demo Test Execution
+name: Write a new pixel
 
 on:
     workflow_dispatch:
